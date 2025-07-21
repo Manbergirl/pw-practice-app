@@ -8,30 +8,65 @@ test.beforeEach(async ({ page }) => {
   await page.getByText("Form Layouts").click();
 });
 
-test.describe.skip("suite1", () => {
-  test("first test", async ({ page }) => {
-    await page.getByText("Form Layouts").click();
-  });
+test("Locator suntax rules", async ({ page }) => {
+  //by tag name
+  await page.locator("input").first().click();
+  //by id
+  page.locator('#inputEmail')
+  //class value
+  page.locator('.shape-rectangle');
+  //by attribute
+  page.locator('[placeholder="Email"]');
+  //by entire class value 
+  page.locator('[class="input-full-width size-medium status-basic shape-rectangle nb-transition"]')
+  //combine different selectors 
+  page.locator("input[placeholder=Email][nbinput]");
+  page.locator("input[inputEmail1][ng-reflect-full-width]")
+  //element by partial match
+  page.locator(":text()");
+});
+test('user facing locators',async ({page})=>{
+ await page.getByRole('textbox',{name:"Email"}).first().click()
+await page.getByRole("button",{name:"SUBMIT"}).first().click()
+await page.getByLabel("Email").first().click()
+await page.getByPlaceholder('Jane Doe').click()
+await page.getByText("Using the Grid").click()
+await page.getByTitle("IoT Dashboard").click()
+})
 
-  test("second test", async ({ page }) => {
-    await page.getByText("Datepicker").click();
-  });
-});
-test.describe("Locator suntax rule", () => {
-  test("suntax rule", async ({ page }) => {
-    //by tag name
-    page.locator("input");
-    //by id
-    await page.locator("#inputEmail").first().click();
-    //by class value
-    page.locator("class^=shape-rectangle");
-    //by attribute
-    page.locator("[placeholder=Email]");
-    //by class value FULL
-    page.locator("[class=input-full-width size-medium status-basic shape-rectangle nb-transition]");
-    //combine different selectors
-    page.locator("input[placeholder=Email][nbinput]");
-    //by partial text match
-    page.locator(":text()");
-  });
-});
+test("locating child options", async({page})=>{
+await page.locator('nb-card nb-radio :text-is("Option 1")').dblclick()
+await page.locator('nb-card').locator('nb-radion').locator(':text-is("Option 1")').click()
+
+await page.locator('nb-card').getByRole('button', {name: "Sign in"}).first().click()
+await page.locator('nb-card').nth(3).getByRole('button').click()
+
+
+//@ това значи 3 ти елемент/нещо като eq("3")
+})
+
+test('locating parent elements',async({page})=>{
+
+await page.locator('nb-card',{hasText:"Using the Grid"}).getByRole('textbox',{name:"Email"}).first().click()
+await page.locator('nb-card',{has:page.locator('#inputEmail1')}).getByRole('textbox',{name:"Email"}).first().click()
+await page.locator('nb-card',).filter({hasText:"Basic form"}).getByRole('textbox',{name:"Email"}).click()
+// await page.locator('nb-card').filter({has:page.locator('status-danger')}).getByRole('textbox',{name:"Password"}).click()
+await page.locator('nb-card').filter({has:page.locator("nb-checkbox")}).filter({hasText:"Sign in"}).getByRole('textbox',{name:"Email"}).click()
+await page.locator(':text-is("Using the Grid")').locator("..").getByRole('textbox',{name:"Email"}).click()
+})
+
+test('Reusing the locator', async({page})=>{
+const basicForm = page.locator('nb-card').filter({hasText:"Basic form"})
+const emIlInputFiled = basicForm.getByRole('textbox',{name:"Email"}).fill("Bebcho.com")
+const passwordImputFiled =basicForm.getByRole('textbox',{name:"Password"}).fill("333")
+
+await basicForm.getByRole('textbox',{name:"Email"}).fill("Bebcho.com")
+await basicForm.getByRole('textbox',{name:"Password"}).fill("333")
+await basicForm.getByRole('button').click()
+
+
+
+
+})
+
+
